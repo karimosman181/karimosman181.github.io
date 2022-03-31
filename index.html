@@ -5,12 +5,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
     <style>
         html,
 body {
   margin: 0;
   height: 100%;
   width: 100%;
+  overflow:hidden;
 }
 #tv{
     margin: 0;
@@ -29,13 +31,95 @@ body {
   min-width: 0;
   min-height: 0;
 }
+
+#loading-container, #dvd-container{
+    margin: 0;
+  height: 100%;
+  width: 100%;
+}
+canvas{
+/*   display:none; */
+  opacity:0;
+  position:absolute;
+  z-index:-9;
+  margin:0px;
+  padding:0px;
+  top:0px;
+  left:0px;
+}
+.load{
+  width:100%;
+  height:100%;
+  display:block;
+}
     </style>
 </head>
 <body>
+
+    <div id="loading-container">
+        <canvas width="150px" height="150px">
+        </canvas>
+        <div class="load"></div>
+    </div>
+  <div id="dvd-container" style="display: none;">
     <div id="tv">
     <div id="logo" style="left: 0px; top: 0px; background-color: #ff0000; color: #ffffff; width: 70px; height: 40px; line-height: 40px">DVD</div>
+    </div>
+  </div>
 </div>
-</div>
+
+
+<script>
+   $(window).on('load', function() { 
+ 
+  $('#loading-container').delay(1000).fadeOut(); 
+
+  $('#dvd-container').delay(850).fadeIn(); 
+})
+</script>
+
+<script>
+    (() => {
+  let c = document.querySelector("canvas");
+  let x = c.getContext("2d");
+  let s = getComputedStyle(c);
+  let w = parseInt(s.width),
+    h = parseInt(s.height),
+    t = s.top,
+    l = s.left,
+    cx = parseInt(s.cx),
+    cy = parseInt(s.cy);
+  (cx =
+    cx != null && !isNaN(cx)
+      ? cx
+      : t == "auto" || t.includes("%") ? 0 : parseInt(t)),
+    (cy =
+      cy != null && !isNaN(cy)
+        ? cy
+        : l == "auto" || l.includes("%") ? 0 : parseInt(l));
+  let col = ["white","black","gray","lightgray","darkgray"];
+  var ri = len => Math.floor(Math.random() * len);
+  let f = "";
+  console.log({ cx, cy, l, t, w, h });
+  for (let i = cx; i <= w; i++) {
+    for (let j = cy; j <= h; j+=1.5) {
+      x.fillStyle = col[ri(col.length)];
+      x.fillRect(i, j, 1, 1);
+    }
+  }
+  setInterval(function() {
+    let rand = () => Math.floor(Math.random() * 400);
+    document.querySelectorAll(".load").forEach(el => {
+      el.setAttribute(
+        "style",
+        `background:url('${c.toDataURL()}')  repeat; background-position:${rand()}px ${rand()}px;`
+      );
+    });
+  }, 20);
+  console.log(c.toDataURL());
+})();
+</script>
+
 
 <script>
 const tvElm = document.querySelector('#tv');
