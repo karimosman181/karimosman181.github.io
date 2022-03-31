@@ -32,7 +32,7 @@ body {
   min-height: 0;
 }
 
-#loading-container, #dvd-container{
+#loading-container-1, #loading-container-2, #dvd-container{
     margin: 0;
   height: 100%;
   width: 100%;
@@ -47,7 +47,7 @@ canvas{
   top:0px;
   left:0px;
 }
-.load{
+.one,.two{
   width:100%;
   height:100%;
   display:block;
@@ -56,11 +56,19 @@ canvas{
 </head>
 <body>
 
-    <div id="loading-container">
-        <canvas width="150px" height="150px">
+    <div id="loading-container-1">
+        <canvas id="loading-glitch-1" width="150px" height="150px">
         </canvas>
-        <div class="load"></div>
+        <div class="one"></div>
     </div>
+
+    <div id="loading-container-2">
+        <canvas id="loading-glitch-2" width="150px" height="150px">
+        </canvas>
+        <div class="two"></div>
+    </div>
+
+
   <div id="dvd-container" style="display: none;">
     <div id="tv">
     <div id="logo" style="left: 0px; top: 0px; background-color: #ff0000; color: #ffffff; width: 70px; height: 40px; line-height: 40px">DVD</div>
@@ -72,16 +80,41 @@ canvas{
 <script>
    $(window).on('load', function() { 
  
-  $('#loading-container').delay(1000).fadeOut(); 
+  $('#loading-container-1').delay(1000).fadeOut(); 
 
   $('#dvd-container').delay(850).fadeIn(); 
 })
 </script>
 
 <script>
+
+function callTimeout(isOpen, time) {
+  setTimeout(function() {
+    if (isOpen) {
+        $('#loading-container-2').fadeOut(); 
+        $('#dvd-container').fadeIn(); 
+      time = (Math.floor(Math.random() * 120) + 20) * 200;
+    } else {
+        $('#loading-container-2').fadeIn(); 
+        $('#dvd-container').fadeOut(); 
+      time = Math.floor(Math.random() * 6) * 200;
+    }
+    isOpen = !isOpen;
+    callTimeout(isOpen, time);
+  }, time);
+}
+
+callTimeout(true, Math.floor(Math.random() * 6) * 100)
+</script>
+
+<script>
     (() => {
-  let c = document.querySelector("canvas");
+  let c = document.querySelector("#loading-glitch-1");
   let x = c.getContext("2d");
+
+  let c2 = document.querySelector("#loading-glitch-2");
+  let x2 = c2.getContext("2d");
+
   let s = getComputedStyle(c);
   let w = parseInt(s.width),
     h = parseInt(s.height),
@@ -97,26 +130,79 @@ canvas{
       cy != null && !isNaN(cy)
         ? cy
         : l == "auto" || l.includes("%") ? 0 : parseInt(l));
+
+
+
+  let s2 = getComputedStyle(c2);
+  let w2 = parseInt(s2.width),
+    h2 = parseInt(s2.height),
+    t2 = s2.top,
+    l2 = s2.left,
+    cx2 = parseInt(s2.cx),
+    cy2 = parseInt(s2.cy);
+  (cx2 =
+    cx2 != null && !isNaN(cx2)
+      ? cx2
+      : t2 == "auto" || t2.includes("%") ? 0 : parseInt(t2)),
+    (cy2 =
+      cy2 != null && !isNaN(cy)
+        ? cy2
+        : l2 == "auto" || l2.includes("%") ? 0 : parseInt(l2));
+
+
   let col = ["white","black","gray","lightgray","darkgray"];
+
+  let row = ["red", "green", "blue" ,"yellow"];
+
   var ri = len => Math.floor(Math.random() * len);
   let f = "";
+
   console.log({ cx, cy, l, t, w, h });
+
+console.log({ cx2, cy2, l2, t2, w2, h2 });
+
+//   for (let i = cx2; i <= w2; i++) {
+//     for (let j = cy2; j <= h2; j+=1.5) {
+//       x2.fillStyle = row[ri(row.length)];
+//       x2.fillRect(j, i, 1, 1000);
+//     }
+//   }
+
+for (let j = cy2; j <= h2; j+=1.5) {
+    for (let i = cx2; i <= w2; i++) {
+      x2.fillStyle = row[ri(row.length)];
+      x2.fillRect(j, i, 1, 8000);
+    }
+  }
+
   for (let i = cx; i <= w; i++) {
     for (let j = cy; j <= h; j+=1.5) {
       x.fillStyle = col[ri(col.length)];
       x.fillRect(i, j, 1, 1);
     }
   }
+
   setInterval(function() {
     let rand = () => Math.floor(Math.random() * 400);
-    document.querySelectorAll(".load").forEach(el => {
+    document.querySelectorAll(".one").forEach(el => {
       el.setAttribute(
         "style",
         `background:url('${c.toDataURL()}')  repeat; background-position:${rand()}px ${rand()}px;`
       );
     });
   }, 20);
-  console.log(c.toDataURL());
+
+  setInterval(function() {
+    let rand = () => Math.floor(Math.random() * 400);
+    document.querySelectorAll(".two").forEach(el => {
+      el.setAttribute(
+        "style",
+        `background:url('${c2.toDataURL()}')  repeat; background-position:${rand()}px ${rand()}px;`
+      );
+    });
+  }, 20);
+
+  
 })();
 </script>
 
